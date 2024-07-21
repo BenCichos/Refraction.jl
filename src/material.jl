@@ -6,15 +6,13 @@ end
 
 function Material(shelf, book, page)
     path = project_path("data/refractive_indices.jld2")
-    println(path)
     material = jldopen(path) do data_file
         group_path = "$shelf/$book/$page"
         haskey(data_file, group_path) || throw(ArgumentError("Material not found"))
         DF = data_file["$group_path/type"]
         data = data_file["$group_path/data"]
         wavelength_range = data_file["$group_path/wavelength_range"]
-        println(DF, data, wavelength_range)
-        return Material(group_path, DF(data), wavelength_range)
+        return Material(group_path, Refractive.DF(data), wavelength_range)
     end
     return material
 end
