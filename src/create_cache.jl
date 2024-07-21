@@ -18,8 +18,31 @@ function str2tuple(str)
     ntuple(i -> arr[i], length(arr))
 end
 
+function update_cache(url)
+    @info "Downloading refractiveindex.info database..."
+    download(url, RI_DATABASE_DOWNLOAD_PATH)
+    @info "Extracting refractiveindex.info database..."
+    zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
+    mkpath(RI_DATABASE_PATH)
+    for file in zarchive.files
+        isdirpath(file.name) ? mkpath(file.name) : write(file.name, read(file))
+    end
+    close(zarchive)
+
+    @info "Creating cache..."
+    create_library()
+    create_data()
+    @info "Cache created."
+
+    @info "Cleaning up..."
+    rm(RI_DATABASE_DOWNLOAD_PATH)
+    rm(RI_DATABASE_PATH, recursive=true)
+    @info "Done."
+end
+
+
 function create_library()
-    lib = load_file(pkgdir(@__MODULE__, "database", "catalog-nk.yml"), dicttype=Dict{String,Any})
+    lib = load_file(joinpath(RI_DATABASE_PATH, "catalog-nk.yml"), dicttype=Dict{String,Any})
 
     jldopen(RI_LIBRARY_PATH, "w") do file
         for shelf in lib
@@ -49,7 +72,7 @@ function create_data()
                     for page in keys(book_group)
                         page_data = book_group[page]
                         path = page_data.path
-                        yaml = load_file(joinpath("./database/data-nk/", path), dicttype=Dict{Symbol,Any})
+                        yaml = load_file(joinpath(RI_DATABASE_PATH, "data-nk", path), dicttype=Dict{Symbol,Any})
                         data = get(yaml, :DATA, Dict{Symbol,String}[]) |> first
                         group_path = "$shelf/$book/$page"
 
