@@ -112,18 +112,16 @@ end
 
 abstract type Tabulated <: DispersionFormula end
 
+(t::Tabulated)(λ) = t.n(λ)
+
 _linear_itp(knots, values) = LinearInterpolator(knots, values, WeakBoundaries())
 const ITP_TYPE = LinearInterpolator{Float64,WeakBoundaries}
 
 function _fix_sorting(raw)
-    # several entries are not sorted by wavelength, so we need to sort them
     if !issorted(@views raw[:, 1])
         raw = sortslices(raw, dims=1, by=first)
     end
 
-    # workaround for two bad entries with only one wavelength:
-    # ("other", "CR-39", "poly") => (name = "Polymer; n 0.58929 µm", path = "other/commercial plastics/CR-39/poly.yml")
-    # ("other", "CR-39", "mono") => (name = "Monomer; n 0.58929 µm", path = "other/commercial plastics/CR-39/mono.yml")
     if size(raw, 1) == 1
         raw = [raw; raw]
     end

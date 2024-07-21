@@ -5,7 +5,7 @@ struct Material{DF<:DispersionFormula}
 end
 
 function Material(shelf, book, page)
-    jldopen("nk_data.jld2") do data_file
+    jldopen("../data/refractive_indices.jld2") do data_file
         group_path = "$shelf/$book/$page"
         DF = data_file["$group_path/type"]
         data = data_file["$group_path/data"]
@@ -21,8 +21,12 @@ end
 
 Material(n::Real; name::String="unnamed") = Material(name, ConstantN(n), (-Inf, Inf))
 
-(m::Material)(λ::Float64) = dispersion(m, λ)
-dispersion(m::Material, λ::Float64) = m.dispersion(λ)
-dispersion(m::Material{T}, λ::Float64) where {T<:Union{TabulatedN,TabulatedNK}} = m.dispersion.n(λ)
+(m::Material)(wavelength::Float64) = dispersion(m, wavelength)
+function dispersion(m::Material, wavelength::Float64)
+    wavelength_range = m.wavelength_range
+    wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
+    wavelength = clamp(wavelength, wavelength_range...)
+    return m.dispersion(wavelength)
+end
 dispersion(m::Material{ConstantN}, ::Float64) = m.dispersion.n
 dispersion(::Material{TabulatedK}, ::Float64) = throw(ArgumentError("Material does not have refractive index data"))
