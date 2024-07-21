@@ -5,17 +5,19 @@ struct Material{DF<:DispersionFormula}
 end
 
 function Material(shelf, book, page)
-    path = project_path("data/refractive_indices.jld2")
-    material = jldopen(path) do data_file
+    material = jldopen(RI_DATA_PATH) do data_file
         group_path = "$shelf/$book/$page"
         haskey(data_file, group_path) || throw(ArgumentError("Material not found"))
         DF = data_file["$group_path/type"]
+        println(DF)
         data = data_file["$group_path/data"]
         wavelength_range = data_file["$group_path/wavelength_range"]
         return Material(group_path, DF(data), wavelength_range)
     end
     return material
 end
+
+
 
 Material(n::Real; name::String="unnamed") = Material(name, ConstantN(n), (-Inf, Inf))
 
