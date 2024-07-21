@@ -5,7 +5,7 @@ struct Material{DF<:DispersionFormula}
 end
 
 function Material(shelf, book, page)
-    jldopen("../data/refractive_indices.jld2") do data_file
+    jldopen(project_path("/data/refractive_indices.jld2")) do data_file
         group_path = "$shelf/$book/$page"
         DF = data_file["$group_path/type"]
         data = data_file["$group_path/data"]
