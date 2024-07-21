@@ -8,18 +8,31 @@ function Material(shelf, book, page)
     material = jldopen(RI_DATA_PATH) do data_file
         group_path = "$shelf/$book/$page"
         haskey(data_file, group_path) || throw(ArgumentError("Material not found"))
-        DF = data_file["$group_path/type"]
-        println(DF)
-        data = data_file["$group_path/data"]
-        wavelength_range = data_file["$group_path/wavelength_range"]
-        return Material(group_path, DF(data), wavelength_range)
+        page = data_file[group_path]
+        page_keys = keys(page)
+        if isone(length(page_keys))
+            DF = page["1/type"]
+            data = page["1/data"]
+            wavelength_range = page["1/wavelength_range"]
+            return Material(group_path, DF(data), wavelength_range)
+        else
+            materials = Material[]
+            for page_key in page_keys
+                DF = page["$page_key/type"]
+                data = page["$page_key/data"]
+                wavelength_range = page["$page_key/wavelength_range"]
+                push!(materials, Material(group_path, DF(data), wavelength_range))
+            end
+            return materials
+        end
     end
     return material
 end
 
+Material(n::Real) = Material("unnamed", ConstantN(n), (-Inf, Inf))
+Material(name::String, n::Real) = Material(name, ConstantN(n), (-Inf, Inf))
 
-
-Material(n::Real; name::String="unnamed") = Material(name, ConstantN(n), (-Inf, Inf))
+show(io::IO, m::Material) = print(io, "Material($(m.name), dispersion formula: $(typeof(m.dispersion)), wavelength range: $(m.wavelength_range))")
 
 (m::Material)(wavelength::Float64) = dispersion(m, wavelength)
 function dispersion(m::Material, wavelength::Float64)

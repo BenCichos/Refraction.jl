@@ -73,19 +73,36 @@ function create_data()
                         page_data = book_group[page]
                         path = page_data.path
                         yaml = load_file(joinpath(RI_DATABASE_PATH, "data-nk", path), dicttype=Dict{Symbol,Any})
-                        data = get(yaml, :DATA, Dict{Symbol,String}[]) |> first
-                        group_path = "$shelf/$book/$page"
-
-                        data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
-                        if haskey(data, :coefficients)
-                            wavelength_range = str2tuple(data[:wavelength_range])
-                            data_file["$group_path/data"] = str2tuple(data[:coefficients])
-                            data_file["$group_path/wavelength_range"] = wavelength_range
+                        data_vec = get(yaml, :DATA, Dict{Symbol,String}[])
+                        if isone(length(data_vec))
+                            group_path = "$shelf/$book/$page/1"
+                            data = only(data_vec)
+                            data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
+                            if haskey(data, :coefficients)
+                                wavelength_range = str2tuple(data[:wavelength_range])
+                                data_file["$group_path/data"] = str2tuple(data[:coefficients])
+                                data_file["$group_path/wavelength_range"] = wavelength_range
+                            else
+                                raw_data = readdlm(IOBuffer(data[:data]), Float64)
+                                wavelength_range = extrema(@view raw_data[:, 1])
+                                data_file["$group_path/data"] = raw_data
+                                data_file["$group_path/wavelength_range"] = wavelength_range
+                            end
                         else
-                            raw_data = readdlm(IOBuffer(data[:data]), Float64)
-                            wavelength_range = extrema(@view raw_data[:, 1])
-                            data_file["$group_path/data"] = raw_data
-                            data_file["$group_path/wavelength_range"] = wavelength_range
+                            for (i, data) in enumerate(data_vec)
+                                group_path = "$shelf/$book/$page/$i"
+                                data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
+                                if haskey(data, :coefficients)
+                                    wavelength_range = str2tuple(data[:wavelength_range])
+                                    data_file["$group_path/data"] = str2tuple(data[:coefficients])
+                                    data_file["$group_path/wavelength_range"] = wavelength_range
+                                else
+                                    raw_data = readdlm(IOBuffer(data[:data]), Float64)
+                                    wavelength_range = extrema(@view raw_data[:, 1])
+                                    data_file["$group_path/data"] = raw_data
+                                    data_file["$group_path/wavelength_range"] = wavelength_range
+                                end
+                            end
                         end
                     end
                 end

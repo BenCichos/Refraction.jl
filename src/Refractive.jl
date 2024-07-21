@@ -5,7 +5,7 @@ using ZipFile
 using YAML: load_file
 using DelimitedFiles: readdlm
 
-import Base: getindex
+import Base: getindex, show
 
 const RI_DATA_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_data.jld2")
 const RI_LIBRARY_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_library.jld2")
