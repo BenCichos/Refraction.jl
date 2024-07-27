@@ -57,9 +57,7 @@ function create_library()
             end
         end
     end
-    jldopen(RI_LIBRARY_PATH, "w") do file
-        file["paths"] = paths
-    end
+    jldsave(RI_LIBRARY_PATH; paths)
     return
 end
 
