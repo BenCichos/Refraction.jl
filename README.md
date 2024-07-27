@@ -32,6 +32,15 @@ vacuum = Material("vacuum", 1.0)
 If you want you can omit the name of the material and the material will
 be saved as "unnamed".
 
+Since it can be difficult to remember the exact names of the materials in
+the database, we provide a function `findmaterial` that allows you to
+search for a material by providing a partial path or a regex pattern.
+```julia
+findmaterial("main/SiO2")
+```
+This function returns a list of paths that match the search pattern. You can
+then use the `Material` function to load the material you want.
+
 ## Compute Refractive Index
 
 Once you have an instance of `Material` you can call it as a functor with
