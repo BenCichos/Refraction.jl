@@ -43,70 +43,66 @@ end
 
 function create_library()
     lib = load_file(joinpath(RI_DATABASE_PATH, "catalog-nk.yml"), dicttype=Dict{String,Any})
-
-    jldopen(RI_LIBRARY_PATH, "w") do file
-        for shelf in lib
-            shelfname = shelf["SHELF"]
-            for book in shelf["content"]
-                haskey(book, "DIVIDER") && continue
-                bookname = book["BOOK"]
-                for page in book["content"]
-                    haskey(page, "DIVIDER") && continue
-                    pagename = string(page["PAGE"])
-                    path = "$shelfname/$bookname/$pagename"
-                    haskey(file, path) && continue
-                    file[path] = (name=page["name"], path=page["data"])
-                end
+    paths = Dict{String, String}()
+    for shelf in lib
+        shelfname = shelf["SHELF"]
+        for book in shelf["content"]
+            haskey(book, "DIVIDER") && continue
+            bookname = book["BOOK"]
+            for page in book["content"]
+                haskey(page, "DIVIDER") && continue
+                pagename = string(page["PAGE"])
+                name = string(shelfname, "/", bookname, "/", pagename)
+                paths[name] = page["data"]
             end
         end
     end
+    jldopen(RI_LIBRARY_PATH, "w") do file
+        file["paths"] = paths
+    end
+    return
 end
 
+
 function create_data()
-    jldopen(RI_LIBRARY_PATH, "r") do library_file
+    jldopen(RI_LIBRARY_PATH, "r+") do library_file
+        paths  = library_file["paths"]
         jldopen(RI_DATA_PATH, "w") do data_file
-            for shelf in keys(library_file)
-                shelf_group = library_file[shelf]
-                for book in keys(shelf_group)
-                    book_group = shelf_group[book]
-                    for page in keys(book_group)
-                        page_data = book_group[page]
-                        path = page_data.path
-                        yaml = load_file(joinpath(RI_DATABASE_PATH, "data-nk", path), dicttype=Dict{Symbol,Any})
-                        data_vec = get(yaml, :DATA, Dict{Symbol,String}[])
-                        if isone(length(data_vec))
-                            group_path = "$shelf/$book/$page/1"
-                            data = only(data_vec)
-                            data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
-                            if haskey(data, :coefficients)
-                                wavelength_range = str2tuple(data[:wavelength_range])
-                                data_file["$group_path/data"] = str2tuple(data[:coefficients])
-                                data_file["$group_path/wavelength_range"] = wavelength_range
-                            else
-                                raw_data = readdlm(IOBuffer(data[:data]), Float64)
-                                wavelength_range = extrema(@view raw_data[:, 1])
-                                data_file["$group_path/data"] = raw_data
-                                data_file["$group_path/wavelength_range"] = wavelength_range
-                            end
+            for (name, path) in paths
+                yaml = load_file(joinpath(RI_DATABASE_PATH, "data-nk", path), dicttype=Dict{Symbol,Any})
+                data_vec = get(yaml, :DATA, Dict{Symbol,String}[])
+                if isone(length(data_vec))
+                    group_path = string(name, "/", 1)
+                    data = only(data_vec)
+                    data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
+                    if haskey(data, :coefficients)
+                        wavelength_range = str2tuple(data[:wavelength_range])
+                        data_file["$group_path/data"] = str2tuple(data[:coefficients])
+                        data_file["$group_path/wavelength_range"] = wavelength_range
+                    else
+                        raw_data = readdlm(IOBuffer(data[:data]), Float64)
+                        wavelength_range = extrema(@view raw_data[:, 1])
+                        data_file["$group_path/data"] = raw_data
+                        data_file["$group_path/wavelength_range"] = wavelength_range
+                    end
+                else
+                    for (i, data) in enumerate(data_vec)
+                        group_path = string(name, "/", i)
+                        data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
+                        if haskey(data, :coefficients)
+                            wavelength_range = str2tuple(data[:wavelength_range])
+                            data_file["$group_path/data"] = str2tuple(data[:coefficients])
+                            data_file["$group_path/wavelength_range"] = wavelength_range
                         else
-                            for (i, data) in enumerate(data_vec)
-                                group_path = "$shelf/$book/$page/$i"
-                                data_file["$group_path/type"] = DISPERSIONFORMULAE[data[:type]]
-                                if haskey(data, :coefficients)
-                                    wavelength_range = str2tuple(data[:wavelength_range])
-                                    data_file["$group_path/data"] = str2tuple(data[:coefficients])
-                                    data_file["$group_path/wavelength_range"] = wavelength_range
-                                else
-                                    raw_data = readdlm(IOBuffer(data[:data]), Float64)
-                                    wavelength_range = extrema(@view raw_data[:, 1])
-                                    data_file["$group_path/data"] = raw_data
-                                    data_file["$group_path/wavelength_range"] = wavelength_range
-                                end
-                            end
+                            raw_data = readdlm(IOBuffer(data[:data]), Float64)
+                            wavelength_range = extrema(@view raw_data[:, 1])
+                            data_file["$group_path/data"] = raw_data
+                            data_file["$group_path/wavelength_range"] = wavelength_range
                         end
                     end
                 end
             end
         end
     end
+    return
 end

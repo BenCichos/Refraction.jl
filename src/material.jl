@@ -28,6 +28,13 @@ function Material(path::String)
     return material
 end
 
+function findmaterial(name::Union{String, Regex})
+    file = jldopen(RI_LIBRARY_PATH, "r")
+    matches = findall(path -> startswith(path, name), file["paths"])
+    close(file)
+    matches
+end
+
 Material(shelf, book, page) = Material("$shelf/$book/$page")
 Material(n::Real) = Material("unnamed", ConstantN(n), (-Inf, Inf))
 Material(name::String, n::Real) = Material(name, ConstantN(n), (-Inf, Inf))

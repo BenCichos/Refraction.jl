@@ -16,7 +16,7 @@ include("dispersionformula.jl")
 export DispersionFormula
 
 include("material.jl")
-export Material, dispersion
+export Material, dispersion, findmaterial
 
 include("update_cache.jl")
 
