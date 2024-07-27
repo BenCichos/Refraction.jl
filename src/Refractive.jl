@@ -18,6 +18,6 @@ export DispersionFormula
 include("material.jl")
 export Material, dispersion
 
-include("create_cache.jl")
+include("update_cache.jl")
 
 end
