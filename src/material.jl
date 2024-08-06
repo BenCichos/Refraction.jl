@@ -1,6 +1,6 @@
-struct Material{DF<:DispersionFormula}
+struct Material{MD<:MaterialData}
     name::String
-    dispersion::DF
+    materialdata::MD
     wavelength_range::Tuple{Float64,Float64}
 end
 
@@ -10,17 +10,19 @@ function Material(path::String)
         page = data_file[path]
         page_keys = keys(page)
         if isone(length(page_keys))
-            DF = page["1/type"]
+            MD_TYPE = page["1/type"]
             data = page["1/data"]
             wavelength_range = page["1/wavelength_range"]
-            return Material(path, DF(data), wavelength_range)
+            material_data = MaterialData(MD_TYPE(), data)
+            return Material(path, material_data, wavelength_range)
         else
             materials = Material[]
             for page_key in page_keys
-                DF = page["$page_key/type"]
+                MD_TYPE = page["$page_key/type"]
                 data = page["$page_key/data"]
                 wavelength_range = page["$page_key/wavelength_range"]
-                push!(materials, Material(path, DF(data), wavelength_range))
+                material_data = MaterialData(MD_TYPE(), data)
+                push!(materials, Material(path, material_data, wavelength_range))
             end
             return materials
         end
@@ -28,25 +30,31 @@ function Material(path::String)
     return material
 end
 
-function findmaterial(name::Union{String, Regex})
+function findmaterial(name::Union{String,Regex})
     file = jldopen(RI_LIBRARY_PATH, "r")
     matches = findall(path -> startswith(path, name), file["paths"])
     close(file)
     matches
 end
 
-Material(shelf, book, page) = Material("$shelf/$book/$page")
-Material(n::Real) = Material("unnamed", ConstantN(n), (-Inf, Inf))
-Material(name::String, n::Real) = Material(name, ConstantN(n), (-Inf, Inf))
+findmaterial(shelf::String, book::String, page::String) = findmaterial(string(shelf, "/", book, "/", page))
 
-show(io::IO, m::Material) = print(io, "Material($(m.name), $(typeof(m.dispersion)), $(m.wavelength_range))")
+Material(shelf, book, page) = Material("$shelf/$book/$page")
+Material(n::Real) = Material("unnamed", MaterialData(ConstantN(), (n, NaN)), (-Inf, Inf))
+Material(n::Real, k::Real) = Material("unnamed", MaterialData(ConstantNK(), (n, k)), (-Inf, Inf))
+Material(name::String, n::Real) = Material(name, MaterialData(ConstantN(), (n, NaN)), (-Inf, Inf))
+Material(name::String, n::Real, k::Real) = Material(name, MaterialData(ConstantNK(), (n, k)), (-Inf, Inf))
+Material(;k::Real) = Material("unnamed", MaterialData(ConstantK(), (NaN, k)), (-Inf, Inf))
+Material(name::String ;k::Real) = Material(name, MaterialData(ConstantK(), (NaN, k)), (-Inf, Inf))
+
+
+
+show(io::IO, m::Material) = print(io, "Material($(m.name), $(m.materialdata), wavelength range = $(m.wavelength_range))")
 
 (m::Material)(wavelength::Float64) = dispersion(m, wavelength)
 function dispersion(m::Material, wavelength::Float64)
     wavelength_range = m.wavelength_range
     wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
     wavelength = clamp(wavelength, wavelength_range...)
-    return m.dispersion(wavelength)
+    return m.materialdata(wavelength)
 end
-dispersion(m::Material{ConstantN}, ::Float64) = m.dispersion.n
-dispersion(::Material{TabulatedK}, ::Float64) = throw(ArgumentError("Material does not have refractive index data"))

@@ -6,7 +6,16 @@ in a JLD2 file format. This allows for storage of julia data types which
 increases the performance of accessing a specific material in the database
 faster.
 
+**The package is very largely based on the RefractiveIndex.jl package and offers similar functionality with some extensions.**
+
 ## Usage
+
+## Initialisation
+
+When using the package for the first time the package will download the latest
+version of the database and create a local cache, in the data folder of the
+package directory. The database is only downloaded when the data folder
+does not contain the necessary files for the package to work correctly.
 
 ### Create Material
 
@@ -20,6 +29,11 @@ This constructs an instance of `Material`, which contains the name of the
 material, the wavelength range, and the dispersion formula to calculate
 the refractive index of the material for a given wavelength.
 
+You can also speficy the *shelf*, *book* and *page* as a path
+```julia
+using Refractive
+sio2 = Material("main/SiO2/Malitson")
+```
 The package also allows you to define materials that have a constant
 refractive index over all wavelengths, which is convenient for definings
 materials such as vaccuum. We extend the dispersion formulae from the
@@ -31,6 +45,8 @@ vacuum = Material("vacuum", 1.0)
 ```
 If you want you can omit the name of the material and the material will
 be saved as "unnamed".
+
+## Find Material
 
 Since it can be difficult to remember the exact names of the materials in
 the database, we provide a function `findmaterial` that allows you to
@@ -48,8 +64,8 @@ a specific wavelength to compute its refractive index. **Note that the
 wavelengths must be given in $\mu m$**. We will use the SiO2 material from
 above as an example.
 ```julia
-λ = 0.5 # Wavelength in μm
-n = sio2(λ)
+wavelength = 0.5 # Wavelength in μm
+n = sio2(wavelength)
 ```
 When calling the material as a functor, this is actually just syntactic
 sugar for calling

@@ -8,9 +8,9 @@ const DISPERSIONFORMULAE = Dict(
     "formula 7" => Herzberger,
     "formula 8" => Retro,
     "formula 9" => Exotic,
-    "tabulated nk" => TabulatedNK,
-    "tabulated n" => TabulatedN,
-    "tabulated k" => TabulatedK,
+    "tabulated nk" => TableNK,
+    "tabulated n" => TableN,
+    "tabulated k" => TableK,
 )
 
 function str2tuple(str)
@@ -30,6 +30,8 @@ function update_cache(url)
     close(zarchive)
 
     @info "Creating cache..."
+    mkpath(dirname(RI_DATA_PATH))
+    mkpath(dirname(RI_LIBRARY_PATH))
     create_library()
     create_data()
     @info "Cache created."
@@ -38,12 +40,12 @@ function update_cache(url)
     rm(RI_DATABASE_DOWNLOAD_PATH)
     rm(RI_DATABASE_PATH, recursive=true)
     @info "Done."
+    return
 end
-
 
 function create_library()
     lib = load_file(joinpath(RI_DATABASE_PATH, "catalog-nk.yml"), dicttype=Dict{String,Any})
-    paths = Dict{String, String}()
+    paths = Dict{String,String}()
     for shelf in lib
         shelfname = shelf["SHELF"]
         for book in shelf["content"]
@@ -61,10 +63,9 @@ function create_library()
     return
 end
 
-
 function create_data()
     jldopen(RI_LIBRARY_PATH, "r+") do library_file
-        paths  = library_file["paths"]
+        paths = library_file["paths"]
         jldopen(RI_DATA_PATH, "w") do data_file
             for (name, path) in paths
                 yaml = load_file(joinpath(RI_DATABASE_PATH, "data-nk", path), dicttype=Dict{Symbol,Any})
@@ -78,9 +79,9 @@ function create_data()
                         data_file["$group_path/data"] = str2tuple(data[:coefficients])
                         data_file["$group_path/wavelength_range"] = wavelength_range
                     else
-                        raw_data = readdlm(IOBuffer(data[:data]), Float64)
-                        wavelength_range = extrema(@view raw_data[:, 1])
-                        data_file["$group_path/data"] = raw_data
+                        table = readdlm(IOBuffer(data[:data]), Float64)
+                        wavelength_range = extrema(@view table[:, 1])
+                        data_file["$group_path/data"] = table
                         data_file["$group_path/wavelength_range"] = wavelength_range
                     end
                 else
