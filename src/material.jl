@@ -46,6 +46,9 @@ Material(name::String, n::Real) = Material(name, MaterialData(ConstantN, (n, NaN
 Material(name::String, n::Real, k::Real) = Material(name, MaterialData(ConstantNK, (n, k)), (-Inf, Inf))
 Material(; name::String="unnamed", k::Real) = Material(name, MaterialData(ConstantK, (NaN, k)), (-Inf, Inf))
 
+const NULL_MATERIAL = Material(NaN)
+isnullmaterial(::Material) = false
+isnullmaterial(m::Material{MaterialConstant{C}}) where {C<:Constant} = isnan(m(Inf))
 show(io::IO, m::Material) = print(io, "Material($(m.name), $(m.materialdata), wavelength range = $(m.wavelength_range))")
 
 (m::Material)(wavelength::Float64) = dispersion(m, wavelength)

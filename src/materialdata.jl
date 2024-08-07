@@ -16,20 +16,21 @@ struct MaterialConstant{C<:Constant} <: MaterialData
     consts::Tuple{Float64,Float64}
 end
 
+
 MaterialData(C::Type{<:Constant}, consts::Tuple{Float64,Float64}) = MaterialConstant{C}(consts)
 (mc::MaterialConstant{C})(wavelength::Real) where {C<:Constant} = C(mc.consts, ConstantIndex_N, wavelength)
 show(io::IO, mc::MaterialConstant{C}) where {C<:Constant} = print(io, "$(C)(consts = $(mc.consts))")
 
-function ConstantNK(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, wavelength::Real)
+function ConstantNK(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, ::Real)
     consts[Int(constantindex)]
 end
 
-function ConstantN(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, wavelength::Real)
+function ConstantN(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, ::Real)
     constantindex === ConstantIndex_K && throw(ArgumentError("ConstantN does not contain information about the extinction coefficient"))
     consts[Int(constantindex)]
 end
 
-function ConstantK(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, wavelength::Real)
+function ConstantK(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, ::Real)
     constantindex === ConstantIndex_N && throw(ArgumentError("ConstantK does not contain information about the refractive index"))
     consts[Int(constantindex)]
 end
