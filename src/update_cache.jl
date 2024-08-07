@@ -21,7 +21,7 @@ end
 function update_cache(url)
     @info "Downloading refractiveindex.info database..."
     download(url, RI_DATABASE_DOWNLOAD_PATH)
-    @info "Extracting refractiveindex.info database..."
+    @info "Extracting refractiveindex.info database into $RI_DATABASE_PATH ..."
     zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
     mkpath(RI_DATABASE_PATH)
     for file in zarchive.files
