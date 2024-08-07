@@ -12,7 +12,7 @@ const RI_LIBRARY_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_library.
 const RI_DATABASE_PATH = pkgdir(@__MODULE__, "database")
 const RI_DATABASE_DOWNLOAD_PATH = pkgdir(@__MODULE__, "database.zip")
 
-include("dispersion.jl")
+include("materialdata.jl")
 
 include("material.jl")
 export Material, dispersion, findmaterial

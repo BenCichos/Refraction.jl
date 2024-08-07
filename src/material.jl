@@ -13,7 +13,7 @@ function Material(path::String)
             MD_TYPE = page["1/type"]
             data = page["1/data"]
             wavelength_range = page["1/wavelength_range"]
-            material_data = MaterialData(MD_TYPE(), data)
+            material_data = MaterialData(MD_TYPE, data)
             return Material(path, material_data, wavelength_range)
         else
             materials = Material[]
@@ -21,7 +21,7 @@ function Material(path::String)
                 MD_TYPE = page["$page_key/type"]
                 data = page["$page_key/data"]
                 wavelength_range = page["$page_key/wavelength_range"]
-                material_data = MaterialData(MD_TYPE(), data)
+                material_data = MaterialData(MD_TYPE, data)
                 push!(materials, Material(path, material_data, wavelength_range))
             end
             return materials
@@ -40,14 +40,11 @@ end
 findmaterial(shelf::String, book::String, page::String) = findmaterial(string(shelf, "/", book, "/", page))
 
 Material(shelf, book, page) = Material("$shelf/$book/$page")
-Material(n::Real) = Material("unnamed", MaterialData(ConstantN(), (n, NaN)), (-Inf, Inf))
-Material(n::Real, k::Real) = Material("unnamed", MaterialData(ConstantNK(), (n, k)), (-Inf, Inf))
-Material(name::String, n::Real) = Material(name, MaterialData(ConstantN(), (n, NaN)), (-Inf, Inf))
-Material(name::String, n::Real, k::Real) = Material(name, MaterialData(ConstantNK(), (n, k)), (-Inf, Inf))
-Material(;k::Real) = Material("unnamed", MaterialData(ConstantK(), (NaN, k)), (-Inf, Inf))
-Material(name::String ;k::Real) = Material(name, MaterialData(ConstantK(), (NaN, k)), (-Inf, Inf))
-
-
+Material(n::Real) = Material("unnamed", MaterialData(ConstantN, (n, NaN)), (-Inf, Inf))
+Material(n::Real, k::Real) = Material("unnamed", MaterialData(ConstantNK, (n, k)), (-Inf, Inf))
+Material(name::String, n::Real) = Material(name, MaterialData(ConstantN, (n, NaN)), (-Inf, Inf))
+Material(name::String, n::Real, k::Real) = Material(name, MaterialData(ConstantNK, (n, k)), (-Inf, Inf))
+Material(; name::String="unnamed", k::Real) = Material(name, MaterialData(ConstantK, (NaN, k)), (-Inf, Inf))
 
 show(io::IO, m::Material) = print(io, "Material($(m.name), $(m.materialdata), wavelength range = $(m.wavelength_range))")
 
