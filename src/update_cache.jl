@@ -25,7 +25,7 @@ function update_cache(url)
     zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
     mkpath(RI_DATABASE_PATH)
     for file in zarchive.files
-        absolute_path = file.name
+        absolute_path = pkgdir(@__MODULE__, file.name)
         mkpath(dirname(absolute_path))
         isdirpath(absolute_path) && continue
         write(absolute_path, read(file))
