@@ -19,20 +19,20 @@ function str2tuple(str)
 end
 
 function update_cache(url)
-    @info "Downloading refractiveindex.info database into $RI_DATABASE_DOWNLOAD_PATH ..."
+    @info "Downloading refractiveindex.info database..."
     download(url, RI_DATABASE_DOWNLOAD_PATH)
-    @info "Extracting refractiveindex.info database into $RI_DATABASE_PATH ..."
+    @info "Extracting refractiveindex.info database..."
     zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
     mkpath(RI_DATABASE_PATH)
     for file in zarchive.files
-        absolute_path = normpath(joinpath(RI_DATABASE_PATH, "..", file.name))
+        absolute_path = file.name
         mkpath(dirname(absolute_path))
         isdirpath(absolute_path) && continue
         write(absolute_path, read(file))
     end
     close(zarchive)
 
-    @info "Creating cache at $RI_DATA_PATH ..."
+    @info "Creating cache at ..."
     mkpath(dirname(RI_DATA_PATH))
     mkpath(dirname(RI_LIBRARY_PATH))
     create_library()
