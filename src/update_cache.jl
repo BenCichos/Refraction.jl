@@ -25,9 +25,9 @@ function update_cache(url)
     zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
     mkpath(RI_DATABASE_PATH)
     for file in zarchive.files
-        isdirpath(file.name) && (mkpath(file.name); continue)
+        mkpath(dirname(file.name))
+        isdirpath(file.name) && continue
         absolute_path = normpath(joinpath(RI_DATABASE_PATH, "..", file.name))
-        touch(absolute_path)
         write(absolute_path, read(file))
     end
     close(zarchive)
