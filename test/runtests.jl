@@ -1,10 +1,11 @@
 using Refraction
+using Refraction: MaterialConstant, ConstantN
 using Test
 
-@testset "Refractive.jl" begin
+@testset "Refraction.jl" begin
     @testset "Constant" begin
         m = Material(1.0)
-        @test m.materialdata == Refractive.MaterialConstant{Refractive.ConstantN}((1.0, NaN))
+        @test m.materialdata == MaterialConstant{ConstantN}((1.0, NaN))
         @test m.wavelength_range == (-Inf, Inf)
         @test m.name == "unnamed"
     end
