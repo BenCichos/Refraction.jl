@@ -1,4 +1,5 @@
 module Refraction
+using Downloads: download
 using JLD2
 using BasicInterpolators: LinearInterpolator, NoBoundaries
 using ZipFile
