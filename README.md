@@ -1,4 +1,4 @@
-# Refractive.jl
+# Refraction.jl
 
 This package provides a simple interface to the refractiveindex.info
 database. The database is downloaded and stored in the data folder locally
