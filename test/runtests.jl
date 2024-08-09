@@ -1,4 +1,4 @@
-using Refractive
+using Refraction
 using Test
 
 @testset "Refractive.jl" begin
