@@ -22,7 +22,7 @@ does not contain the necessary files for the package to work correctly.
 You can load a given material from the database using the `Material` function.
 The function takes a *shelf*, *book*, and *page* as parameters.
 ```julia
-using Refractive
+using Refraction
 sio2 = Material("main", "SiO2", "Malitson")
 ```
 This constructs an instance of `Material`, which contains the name of the
@@ -31,7 +31,6 @@ the refractive index of the material for a given wavelength.
 
 You can also speficy the *shelf*, *book* and *page* as a path
 ```julia
-using Refractive
 sio2 = Material("main/SiO2/Malitson")
 ```
 The package also allows you to define materials that have a constant
