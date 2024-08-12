@@ -19,6 +19,15 @@ end
 
 MaterialData(C::Type{<:Constant}, consts::Tuple{Float64,Float64}) = MaterialConstant{C}(consts)
 (mc::MaterialConstant{C})(wavelength::Real) where {C<:Constant} = C(mc.consts, ConstantIndex_N, wavelength)
+function extinction(mc::MaterialConstant{C}, wavelength::Real; default::Float64=0.0) where {C<:Constant}
+    try
+        return C(mc.consts, ConstantIndex_K, wavelength)
+    catch e
+        @warn "$(e.msg). Return $default."
+        return default
+    end
+end
+
 show(io::IO, mc::MaterialConstant{C}) where {C<:Constant} = print(io, "$(C)(consts = $(mc.consts))")
 
 function ConstantNK(consts::Tuple{Float64,Float64}, constantindex::ConstantIndex, ::Real)
@@ -54,6 +63,10 @@ end
 MaterialData(F::Type{<:Formula}, coeffs::NTuple{N,Float64}) where {N} = MaterialFormula{N,F}(coeffs)
 
 (mf::MaterialFormula{N,F})(wavelength::Real) where {N,F<:Formula} = F(mf.coeffs, wavelength)
+function extinction(::MaterialFormula{N,F}, wavelength::Real; default::Float64=0.0) where {N,F<:Formula}
+    @warn "MaterialFormula does not contain information about the extinction coefficient. Returning $default."
+    default
+end
 show(io::IO, mf::MaterialFormula{N,F}) where {N,F<:Formula} = print(io, "$(F)(coeffs = $(mf.coeffs))")
 
 function Sellmeier(c::NTuple{N,Float64}, wavelength::Real) where {N}
@@ -153,13 +166,19 @@ end
 MaterialData(T::Type{<:Table}, table::Matrix{Float64}) = MaterialTable{T}(table)
 
 (mt::MaterialTable{T})(wavelength::Real) where {T<:Table} = T(mt.table, TableIndex_N, wavelength)
-extinctioncoefficient(mt::MaterialTable{T}, wavelength::Real) where {T<:Table} = T(mt.table, TableIndex_K, wavelength)
+function extinction(mt::MaterialTable{T}, wavelength::Real; default::Float64=0.0) where {T<:Table}
+    try
+        return T(mt.table, TableIndex_K, wavelength)
+    catch e
+        @warn "$(e.msg). Returning $default."
+        return default
+    end
+end
 show(io::IO, mt::MaterialTable{T}) where {T} = print(io, "$(T)(size = $(size(mt.table)))")
 
-
 function interpolate(wavelength_column::W, interpolation_column::I, wavelength::Float64) where {W<:AbstractArray,I<:AbstractArray}
-    wavelength <= first(wavelength_column) && return first(interpolation_column)
-    wavelength >= last(wavelength_column) && return last(interpolation_column)
+    wavelength == first(wavelength_column) && return first(interpolation_column)
+    wavelength == last(wavelength_column) && return last(interpolation_column)
 
     upper_index = searchsortedfirst(wavelength_column, wavelength)
     lower_index = upper_index - 1

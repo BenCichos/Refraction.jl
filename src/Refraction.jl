@@ -1,7 +1,6 @@
 module Refraction
 using Downloads: download
 using JLD2
-using BasicInterpolators: LinearInterpolator, NoBoundaries
 using ZipFile
 using YAML: load_file
 using DelimitedFiles: readdlm
@@ -17,7 +16,7 @@ include("materialdata.jl")
 include("material.jl")
 include("update_cache.jl")
 
-export Material, findmaterial, NULL_MATERIAL, isnullmaterial, dispersion
+export Material, findmaterial, NULL_MATERIAL, isnullmaterial, dispersion, extinction
 
 function __init__()
     (ispath(RI_DATA_PATH) && ispath(RI_LIBRARY_PATH)) && return

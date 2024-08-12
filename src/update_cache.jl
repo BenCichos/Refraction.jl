@@ -32,12 +32,11 @@ function update_cache(url)
     end
     close(zarchive)
 
-    @info "Creating cache at ..."
+    @info "Creating cache..."
     mkpath(dirname(RI_DATA_PATH))
     mkpath(dirname(RI_LIBRARY_PATH))
     create_library()
     create_data()
-    @info "Cache created."
 
     @info "Cleaning up..."
     rm(RI_DATABASE_DOWNLOAD_PATH)

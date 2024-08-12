@@ -51,10 +51,17 @@ isnullmaterial(::Material) = false
 isnullmaterial(m::Material{MaterialConstant{C}}) where {C<:Constant} = isnan(m(Inf))
 show(io::IO, m::Material) = print(io, "Material($(m.name), $(m.materialdata), wavelength range = $(m.wavelength_range))")
 
-(m::Material)(wavelength::Float64) = dispersion(m, wavelength)
-function dispersion(m::Material, wavelength::Float64)
+(m::Material)(wavelength::Real) = dispersion(m, wavelength)
+function dispersion(m::Material, wavelength::Real)
     wavelength_range = m.wavelength_range
     wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
     wavelength = clamp(wavelength, wavelength_range...)
     return m.materialdata(wavelength)
+end
+
+function extinction(m::Material, wavelength::Real; default::Float64=0.0)
+    wavelength_range = m.wavelength_range
+    wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
+    wavelength = clamp(wavelength, wavelength_range...)
+    return extinction(m.materialdata, wavelength, default=default)
 end
