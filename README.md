@@ -1,12 +1,12 @@
 # Refraction.jl
 
-This package provides a simple interface to the refractiveindex.info
-database. The database is downloaded and stored in the data folder locally
-in a JLD2 file format. This allows for storage of julia data types which
-increases the performance of accessing a specific material in the database
-faster.
+This package provides an interface to the refractiveindex.info
+database that is stored locally as JLD2 data file. This allows for:
 
-**The package is very largely based on the RefractiveIndex.jl package and offers similar functionality with some extensions.**
+- Computation of wavelength dependent refractive indices of the material
+- Computation of wavelength dependent extinction coefficients of the material
+- Computation of the transmittance of the material for a given distance
+- Creation of custom materials
 
 ## Usage
 
