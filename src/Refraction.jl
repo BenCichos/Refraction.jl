@@ -16,7 +16,9 @@ include("materialdata.jl")
 include("material.jl")
 include("update_cache.jl")
 
-export Material, findmaterial, NULL_MATERIAL, isnullmaterial, dispersion, extinction
+export Material, findmaterial
+export NULL_MATERIAL, isnullmaterial
+export dispersion, extinction, transmittance
 
 function __init__()
     (ispath(RI_DATA_PATH) && ispath(RI_LIBRARY_PATH)) && return

@@ -16,7 +16,6 @@ struct MaterialConstant{C<:Constant} <: MaterialData
     consts::Tuple{Float64,Float64}
 end
 
-
 MaterialData(C::Type{<:Constant}, consts::Tuple{Float64,Float64}) = MaterialConstant{C}(consts)
 (mc::MaterialConstant{C})(wavelength::Real) where {C<:Constant} = C(mc.consts, ConstantIndex_N, wavelength)
 function extinction(mc::MaterialConstant{C}, wavelength::Real; default::Float64=0.0) where {C<:Constant}

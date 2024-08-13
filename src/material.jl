@@ -65,3 +65,5 @@ function extinction(m::Material, wavelength::Real; default::Float64=0.0)
     wavelength = clamp(wavelength, wavelength_range...)
     return extinction(m.materialdata, wavelength, default=default)
 end
+
+transmittance(m::Material, wavelength::Real, distance::Real) = exp(-4 * pi * extinction(m, wavelength) * distance / wavelength)
