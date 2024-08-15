@@ -1,11 +1,16 @@
 module Refraction
-using Downloads: download
+
+@doc let
+    path = pkgdir(@__MODULE__, "README.md")
+    include_dependency(path)
+    read(path, String)
+end Refraction
+
 using JLD2
 using ZipFile
 using YAML: load_file
+using Downloads: download
 using DelimitedFiles: readdlm
-
-import Base: getindex, show
 
 const RI_DATA_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_data.jld2")
 const RI_LIBRARY_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_library.jld2")
@@ -16,6 +21,8 @@ const CURRENT_DATABASE_URL = "https://refractiveindex.info/download/database/rii
 include("materialdata.jl")
 include("material.jl")
 include("update_cache.jl")
+include_dependency(RI_DATA_PATH)
+include_dependency(RI_LIBRARY_PATH)
 
 export Material, findmaterial
 export NULL_MATERIAL, isnullmaterial
