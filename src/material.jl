@@ -105,11 +105,11 @@ end
 
 """
 ```
-findmaterial(name::Regex) -> Vector{String}
+findmaterial(name::Regex) -> Set{String}
 ```
 
 Search for materials in the database that match the given regular expression.
-The method returns a vector of paths to the materials that startswith the regular expression.
+The method returns a set of paths to the materials that startswith the regular expression.
 The search is case-insensitive.
 
 # Arguments
@@ -117,13 +117,13 @@ The search is case-insensitive.
 """
 function findmaterial(name::Regex)
     paths = load(RI_LIBRARY_PATH, "paths")
-    findall(path -> startswith(lowercase(path), name), paths)
+    filter(path -> occursin(name, lowercase(path)), keys(paths))
 end
 
 
 """
 ```
-findmaterial(name::String) -> Vector{String}
+findmaterial(name::String) -> Set{String}
 ```
 
 # Arguments
@@ -132,7 +132,7 @@ findmaterial(name::String) -> Vector{String}
 function findmaterial(name::String)
     name = replace(name, " " => "/")
     paths = load(RI_LIBRARY_PATH, "paths")
-    findall(path -> startswith(lowercase(path), lowercase(name)), paths)
+    filter(path -> occursin(lowercase(name), lowercase(path)), keys(paths))
 end
 
 
