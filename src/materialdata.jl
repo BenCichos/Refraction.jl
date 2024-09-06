@@ -195,7 +195,7 @@ function interpolate(wavelength_column::W, interpolation_column::I, wavelength::
     wavelength == first(wavelength_column) && return first(interpolation_column)
     wavelength == last(wavelength_column) && return last(interpolation_column)
 
-    upper_index = searchsortedfirst(wavelength_column, wavelength)
+    upper_index = searchsortedfirst((@view wavelength_column[:]), wavelength)
     lower_index = upper_index - 1
 
     @inbounds wl_upper = wavelength_column[upper_index]
