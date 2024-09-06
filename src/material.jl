@@ -193,7 +193,6 @@ return the default value.
 """
 function dispersion(m::Material, wavelength::Real; default::Real=1.0)
     wavelength_range = m.wavelength_range
-    wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
     wavelength = clamp(wavelength, wavelength_range...)
     return m.materialdata(wavelength, default)
 end
@@ -215,7 +214,7 @@ return the default value.
 """
 function extinction(m::Material, wavelength::Real; default::Float64=0.0)
     wavelength_range = m.wavelength_range
-    wavelength_range[1] <= wavelength <= wavelength_range[2] || @warn "Wavelength out of range. Clamping to $(wavelength_range)"
+    wavelength_range[1] <= wavelength <= wavelength_range[2]
     wavelength = clamp(wavelength, wavelength_range...)
     return extinction(m.materialdata, wavelength, default)
 end
