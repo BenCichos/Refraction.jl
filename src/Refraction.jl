@@ -12,6 +12,8 @@ using YAML: load_file
 using Downloads: download
 using DelimitedFiles: readdlm
 
+import Base: show
+
 const RI_DATA_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_data.jld2")
 const RI_LIBRARY_PATH = pkgdir(@__MODULE__, "data", "refractive_indices_library.jld2")
 const RI_DATABASE_PATH = pkgdir(@__MODULE__, "database")
@@ -19,6 +21,11 @@ const RI_DATABASE_DOWNLOAD_PATH = pkgdir(@__MODULE__, "database.zip")
 const CURRENT_DATABASE_URL = "https://refractiveindex.info/download/database/rii-database-2023-10-04.zip"
 
 include("materialdata.jl")
+
+include("constant.jl")
+include("formula.jl")
+include("table.jl")
+
 include("material.jl")
 include("update_cache.jl")
 include_dependency(RI_DATA_PATH)
