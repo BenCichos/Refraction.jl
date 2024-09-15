@@ -2,7 +2,7 @@
 
 julia_version = "1.10.5"
 manifest_format = "2.0"
-project_hash = "fb1ce4ca3377b50582137f048a9b28a172ba7ba6"
+project_hash = "d556f4b52e9d6e3448fda58981dccda8697fc886"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -44,9 +44,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[deps.JLD2]]
 deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "PrecompileTools", "Requires", "TranscodingStreams"]
-git-tree-sha1 = "a0746c21bdc986d0dc293efa6b1faee112c37c28"
+git-tree-sha1 = "1dbe274ad1c199490b19a153b60a9e46c5386f8d"
 uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.4.53"
+version = "0.5.1"
 
 [[deps.JLLWrappers]]
 deps = ["Artifacts", "Preferences"]
@@ -199,12 +199,6 @@ deps = ["Base64", "Dates", "Printf", "StringEncodings"]
 git-tree-sha1 = "dea63ff72079443240fbd013ba006bcbc8a9ac00"
 uuid = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 version = "0.4.12"
-
-[[deps.ZipFile]]
-deps = ["Libdl", "Printf", "Zlib_jll"]
-git-tree-sha1 = "f492b7fe1698e623024e873244f10d89c95c340a"
-uuid = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
-version = "0.10.1"
 
 [[deps.Zlib_jll]]
 deps = ["Libdl"]

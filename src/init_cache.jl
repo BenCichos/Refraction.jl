@@ -18,25 +18,11 @@ function str2tuple(str::String)
     ntuple(i -> arr[i], length(arr))
 end
 
-function update_cache(url)
-    download(url, RI_DATABASE_DOWNLOAD_PATH)
-    zarchive = ZipFile.Reader(RI_DATABASE_DOWNLOAD_PATH)
-    mkpath(RI_DATABASE_PATH)
-    for file in zarchive.files
-        absolute_path = pkgdir(@__MODULE__, file.name)
-        mkpath(dirname(absolute_path))
-        isdirpath(absolute_path) && continue
-        write(absolute_path, read(file))
-    end
-    close(zarchive)
-
+function init_cache()
     mkpath(dirname(RI_DATA_PATH))
     mkpath(dirname(RI_LIBRARY_PATH))
     create_library()
     create_data()
-
-    rm(RI_DATABASE_DOWNLOAD_PATH)
-    rm(RI_DATABASE_PATH, recursive=true)
     return
 end
 
