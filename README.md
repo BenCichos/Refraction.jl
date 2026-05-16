@@ -7,3 +7,5 @@ database that is stored locally as JLD2 data file. This allows for:
 - Computation of wavelength dependent extinction coefficients of the material
 - Computation of the transmittance of the material for a given distance
 - Creation of custom materials
+
+The package is based on code provided by https://refractiveindex.info/
